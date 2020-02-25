@@ -1,17 +1,8 @@
-const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
-const morgan = require("morgan");
-const reviewToonRoute = require("./routes/reviewToonRoute");
 
 require("dotenv").config({ path: "./config.env" });
 
-const app = express();
-app.use(morgan("dev"));
-const port = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(express.json());
+const app = require("./app");
 
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",
@@ -32,8 +23,15 @@ mongoose
     console.log(err);
   });
 
-app.use("/api/review", reviewToonRoute);
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+  console.log(`Server is running on port: ${port}...`);
+});
 
-app.listen(port, () => {
-  console.log(`Server is running on port: ${port}`);
+process.on("unhandledRejection", err => {
+  console.log("UNHANDLER REJECTION! Shutting down...");
+  console.log(err.name, err.message);
+  server.close(() => {
+    process.exit(1);
+  });
 });

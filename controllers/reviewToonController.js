@@ -1,37 +1,32 @@
 const ReviewToon = require("../models/reviewToon.model");
+const APIFeatures = require("../utils/apiFeatures");
+const appError = require("../utils/appError");
+const catchAsync = require("../utils/catchAsync");
 
-const getAllReview = async (req, res) => {
-  const reviewToon = await ReviewToon.find();
-  try {
-    res.status(200).json({
-      status: "success",
-      results: reviewToon.length,
-      reviewToon
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(404).json({
-      status: "fail",
-      error
-    });
-  }
-};
+const getAllReview = catchAsync(async (req, res) => {
+  const feature = new APIFeatures(ReviewToon.find(), req.query)
+    .filter()
+    .sort()
+    .limitfields()
+    .paginate();
 
-const createReview = async (req, res) => {
+  const reviewToon = await feature.query;
+
+  res.status(200).json({
+    status: "success",
+    results: reviewToon.length,
+    data: { reviewToon }
+  });
+});
+
+const createReview = catchAsync(async (req, res) => {
   const newReviewtoon = await ReviewToon.create(req.body);
-  try {
-    res.status(201).json({
-      status: "success",
-      review: { newReviewtoon }
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({
-      status: "fail",
-      error
-    });
-  }
-};
+
+  res.status(201).json({
+    status: "success",
+    review: { newReviewtoon }
+  });
+});
 
 const getReview = async (req, res) => {
   const review = await ReviewToon.findById(req.params.id);
@@ -69,7 +64,7 @@ const editReview = async (req, res) => {
     new: true
   });
   try {
-    res.status(201).json({
+    res.status(200).json({
       status: "success",
       review
     });
