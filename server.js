@@ -4,17 +4,15 @@ require("dotenv").config({ path: "./.env" });
 
 const app = require("./app");
 
+const DB = process.env.DATABASE;
+
 mongoose
-  .connect(
-    "mongodb+srv://BusyOnFriday:iL4lxGNLrlpZNbQQ@cluster0-ckxmp.mongodb.net/reviewtoon?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-      useMongoClient: true
-    }
-  )
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+  })
   .then(() => {
     console.log("DB connection successful !");
   })
